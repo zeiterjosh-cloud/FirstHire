@@ -1,821 +1,183 @@
- <!DOCTYPE html>
- <html lang="en">
- <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1">
- <title>FirstHire – Interview Performance System</title>
- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
--
- <style>
-+:root {
-+  --fh-border: #e2e8f0;
-+  --fh-muted: #64748b;
-+}
-+
- body {
-   background: #f8fafc;
-   font-family: system-ui, -apple-system, sans-serif;
- }
- 
- nav {
--  border-bottom: 1px solid #e2e8f0;
-+  border-bottom: 1px solid var(--fh-border);
-   background: white;
-+  position: sticky;
-+  top: 0;
-+  z-index: 10;
- }
- 
- .section {
-   display: none;
-   margin-top: 2rem;
- }
- 
- .section.active {
-   display: block;
- }
- 
-+.grid-two {
-+  display: grid;
-+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-+  gap: 1rem;
-+}
-+
- .card-box {
-   background: white;
--  padding: 1.5rem;
-+  padding: 1.25rem;
-   border-radius: 12px;
-   border: 1px solid #e5e7eb;
--  margin-top: 1.5rem;
-+  margin-top: 1rem;
- }
- 
- .result-label {
-   font-weight: 600;
-   margin-top: 1rem;
- }
- 
- .progress-box {
--  margin-top: 2rem;
-+  margin-top: 1.5rem;
-   padding: 1rem;
-   background: #eef2ff;
-   border-radius: 10px;
- }
- 
--button {
--  margin-top: 1rem;
-+.output {
-+  min-height: 2rem;
-+}
-+
-+small, .muted {
-+  color: var(--fh-muted);
- }
- 
- footer {
-   margin-top: 4rem;
-   padding: 2rem 0;
-   text-align: center;
--  color: #64748b;
-+  color: var(--fh-muted);
-+}
-+
-+canvas {
-+  background: white;
-+  border: 1px solid var(--fh-border);
-+  border-radius: 8px;
-+  width: 100%;
-+  height: 220px;
-+}
-+
-+.tag {
-+  display: inline-block;
-+  background: #f1f5f9;
-+  border: 1px solid #cbd5e1;
-+  border-radius: 999px;
-+  padding: 0.15rem 0.6rem;
-+  margin-right: 0.35rem;
-+  margin-top: 0.35rem;
-+  font-size: 0.82rem;
-+}
-+
-+ul.tight {
-+  margin-bottom: 0;
- }
- </style>
- </head>
- <body>
--
- <nav class="container-fluid">
--<ul>
--<li><strong>FirstHire</strong></li>
--</ul>
--<ul>
--<li><a href="#" onclick="showSection('home')">Home</a></li>
--<li><a href="#" onclick="showSection('strength')">Strength Builder</a></li>
--<li><a href="#" onclick="showSection('practice')">Practice</a></li>
--<li><a href="#" onclick="showSection('performance')">Performance</a></li>
--</ul>
-+  <ul>
-+    <li><strong>FirstHire</strong></li>
-+  </ul>
-+  <ul>
-+    <li><a href="#" onclick="showSection('home')">Home</a></li>
-+    <li><a href="#" onclick="showSection('strength')">Strength Builder</a></li>
-+    <li><a href="#" onclick="showSection('practice')">Practice + Feedback</a></li>
-+    <li><a href="#" onclick="showSection('performance')">Mock Interview</a></li>
-+    <li><a href="#" onclick="showSection('storyBank')">Story Bank</a></li>
-+    <li><a href="#" onclick="showSection('tools')">Tools</a></li>
-+  </ul>
- </nav>
- 
- <main class="container">
--
--<!-- HOME -->
--<div id="home" class="section active">
--<h2>Interview Performance System</h2>
--<p>From “I don’t know what to say” to “I’m ready.”</p>
--
--<div class="progress-box">
--<strong>Sessions Completed:</strong> <span id="sessions">0</span><br>
--<strong>Confidence Score:</strong> <span id="confidence">50</span>%
--</div>
--</div>
--
--<!-- STRENGTH BUILDER -->
--<div id="strength" class="section">
--<h2>Strength Builder</h2>
--<p>Enter one of your experiences below.</p>
--
--<input type="text" id="experienceInput" placeholder="Example: Soccer team captain" />
--
--<button onclick="analyzeStrength()">Analyze</button>
--
--<div class="card-box">
--<div class="result-label">Transferable Strength:</div>
--<div id="strengthResult"></div>
--
--<div class="result-label">Interview Framing:</div>
--<div id="framingResult"></div>
--</div>
--</div>
--
--<!-- PRACTICE -->
--<div id="practice" class="section">
--<h2>Practice Arena</h2>
--<p>Generate a common interview question.</p>
--
--<button onclick="generateQuestion()">Generate Question</button>
--
--<div class="card-box">
--<div id="questionResult"></div>
--</div>
--</div>
--
--<!-- PERFORMANCE -->
--<div id="performance" class="section">
--<h2>Performance Mode</h2>
--<p>Answer rapid-fire interview questions.</p>
--
--<button onclick="startPerformance()">Start Session</button>
--
--<div class="card-box">
--<div id="performanceQuestion"></div>
--</div>
--</div>
--
-+  <div id="home" class="section active">
-+    <h2>Interview Performance System</h2>
-+    <p>From “I don’t know what to say” to “I’m ready.”</p>
-+
-+    <div class="progress-box">
-+      <strong>Sessions Completed:</strong> <span id="sessions">0</span><br>
-+      <strong>Confidence Score:</strong> <span id="confidence">50</span>%<br>
-+      <strong>Current Role Pack:</strong> <span id="currentRole">General</span><br>
-+      <strong>Last Recommendation:</strong> <span id="nextRecommendation">Start a practice round to get coaching.</span>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Role-Specific Question Pack</h4>
-+      <label for="roleSelect">Pick your target role</label>
-+      <select id="roleSelect" onchange="setRole(this.value)">
-+        <option value="General">General</option>
-+        <option value="Retail">Retail</option>
-+        <option value="Customer Service">Customer Service</option>
-+        <option value="Internship">Internship</option>
-+        <option value="Sales">Sales</option>
-+      </select>
-+      <small>Questions and framing suggestions adapt to this role pack.</small>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Progress Trend</h4>
-+      <canvas id="progressChart" width="900" height="220" aria-label="Confidence trend chart"></canvas>
-+      <small>Each action logs your confidence trend to local history.</small>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Session History</h4>
-+      <div id="historyList" class="output muted">No sessions yet.</div>
-+    </div>
-+  </div>
-+
-+  <div id="strength" class="section">
-+    <h2>Strength Builder</h2>
-+    <p>Turn your experience into role-relevant strengths.</p>
-+
-+    <label for="experienceInput">Experience</label>
-+    <input type="text" id="experienceInput" placeholder="Example: Soccer team captain" />
-+    <button onclick="analyzeStrength()">Analyze Experience</button>
-+
-+    <div class="card-box">
-+      <div class="result-label">Transferable Strength</div>
-+      <div id="strengthResult" class="output"></div>
-+      <div class="result-label">Interview Framing</div>
-+      <div id="framingResult" class="output"></div>
-+      <div class="result-label">Role-Specific Emphasis</div>
-+      <div id="roleEmphasis" class="output"></div>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Weakness → Strength Reframer</h4>
-+      <label for="weaknessInput">Type a concern</label>
-+      <input type="text" id="weaknessInput" placeholder="Example: I get nervous in interviews" />
-+      <button onclick="reframeWeakness()">Reframe Professionally</button>
-+      <div class="result-label">Reframed Answer</div>
-+      <div id="reframeResult" class="output"></div>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Tell Me About Yourself Builder</h4>
-+      <label for="pitchBackground">1) Background</label>
-+      <input type="text" id="pitchBackground" placeholder="Current student with customer-facing volunteer work" />
-+      <label for="pitchStrengths">2) Top strengths</label>
-+      <input type="text" id="pitchStrengths" placeholder="Strong communicator, dependable, team-oriented" />
-+      <label for="pitchWhyRole">3) Why this role</label>
-+      <input type="text" id="pitchWhyRole" placeholder="I enjoy helping customers and solving problems quickly" />
-+      <button onclick="buildPitch()">Build Pitch</button>
-+      <button class="secondary" onclick="savePitch()">Save Pitch</button>
-+      <div class="result-label">Polished Pitch</div>
-+      <div id="pitchOutput" class="output"></div>
-+      <div class="result-label">Saved Pitch</div>
-+      <div id="savedPitch" class="output muted"></div>
-+    </div>
-+  </div>
-+
-+  <div id="practice" class="section">
-+    <h2>Practice Arena + Answer Feedback</h2>
-+    <p>Generate a role-specific question and score your written answer.</p>
-+
-+    <button onclick="generateQuestion()">Generate Question</button>
-+    <div class="card-box">
-+      <div id="questionResult" class="output"></div>
-+      <label for="answerInput">Type your answer</label>
-+      <textarea id="answerInput" rows="5" placeholder="Use STAR: Situation, Task, Action, Result"></textarea>
-+      <button onclick="scoreAnswer()">Get Feedback</button>
-+      <div class="result-label">Feedback Scores</div>
-+      <div id="feedbackScores" class="output"></div>
-+      <div class="result-label">Improved Version Suggestion</div>
-+      <div id="improvedAnswer" class="output"></div>
-+    </div>
-+  </div>
-+
-+  <div id="performance" class="section">
-+    <h2>Timed Mock Interview</h2>
-+    <p>Run a 5-question round with countdown prompts.</p>
-+
-+    <div class="grid-two">
-+      <div class="card-box">
-+        <button onclick="startMockInterview()">Start 5-Question Mock</button>
-+        <button class="secondary" onclick="nextMockQuestion()">Next Question</button>
-+        <p><strong>Question <span id="mockIndex">0</span>/5</strong></p>
-+        <div id="performanceQuestion" class="output"></div>
-+      </div>
-+      <div class="card-box">
-+        <p><strong>Time Left:</strong> <span id="timer">0</span>s</p>
-+        <p><strong>Round Score:</strong> <span id="mockScore">0</span>/100</p>
-+        <div id="mockSummary" class="output muted">No round started yet.</div>
-+      </div>
-+    </div>
-+  </div>
-+
-+  <div id="storyBank" class="section">
-+    <h2>Behavioral Story Bank</h2>
-+    <p>Store stories and auto-suggest which one to use.</p>
-+
-+    <div class="card-box">
-+      <label for="storyTheme">Theme</label>
-+      <select id="storyTheme">
-+        <option>Leadership</option>
-+        <option>Teamwork</option>
-+        <option>Conflict</option>
-+        <option>Failure</option>
-+        <option>Problem Solving</option>
-+        <option>Customer Success</option>
-+      </select>
-+      <label for="storyText">Story summary</label>
-+      <textarea id="storyText" rows="4" placeholder="Situation, action you took, and outcome"></textarea>
-+      <button onclick="addStory()">Add Story</button>
-+      <div class="result-label">Saved Stories</div>
-+      <div id="storyList" class="output muted">No stories saved yet.</div>
-+    </div>
-+
-+    <div class="card-box">
-+      <label for="storyQuestion">Question to match</label>
-+      <input id="storyQuestion" placeholder="Describe a time you resolved a conflict" />
-+      <button onclick="suggestStory()">Suggest Best Story</button>
-+      <div class="result-label">Recommended Story</div>
-+      <div id="storySuggestion" class="output"></div>
-+    </div>
-+  </div>
-+
-+  <div id="tools" class="section">
-+    <h2>Advanced Tools</h2>
-+    <p>Job description matching and next-best-practice coaching.</p>
-+
-+    <div class="card-box">
-+      <h4>Job Description Match</h4>
-+      <label for="jobDescription">Paste job description</label>
-+      <textarea id="jobDescription" rows="6" placeholder="Paste a job description here"></textarea>
-+      <button onclick="matchJobDescription()">Extract Skills + Recommend Focus</button>
-+      <div class="result-label">Top Skills Identified</div>
-+      <div id="jdSkills" class="output"></div>
-+      <div class="result-label">What You Should Emphasize</div>
-+      <div id="jdEmphasis" class="output"></div>
-+    </div>
-+
-+    <div class="card-box">
-+      <h4>Next Best Practice Coach</h4>
-+      <button onclick="generateNextRecommendation()">Generate Recommendation</button>
-+      <div id="coachOutput" class="output"></div>
-+    </div>
-+  </div>
- </main>
- 
- <footer>
--FirstHire • Practice. Position. Perform.
-+  FirstHire • Practice. Position. Perform.
- </footer>
- 
- <script>
-+const roleQuestionPacks = {
-+  General: [
-+    "Tell me about yourself.",
-+    "Why do you want this job?",
-+    "Describe a time you worked on a team.",
-+    "What is one challenge you overcame?",
-+    "Why should we hire you?"
-+  ],
-+  Retail: [
-+    "How would you handle a difficult customer?",
-+    "Tell me about a time you worked in a fast-paced environment.",
-+    "How do you prioritize tasks during busy hours?",
-+    "Describe a time you upsold or made a recommendation.",
-+    "How do you stay positive during long shifts?"
-+  ],
-+  "Customer Service": [
-+    "Describe a time you solved a customer problem.",
-+    "How do you manage frustrated customers?",
-+    "What does great service mean to you?",
-+    "How do you communicate clearly under pressure?",
-+    "Tell me about a time you turned a negative experience into a positive one."
-+  ],
-+  Internship: [
-+    "Why are you interested in this internship?",
-+    "Tell me about a class project you're proud of.",
-+    "How do you learn quickly in a new environment?",
-+    "Describe a time you took initiative without being asked.",
-+    "How do you handle feedback from mentors?"
-+  ],
-+  Sales: [
-+    "How would you build trust with a new customer?",
-+    "Tell me about a time you persuaded someone.",
-+    "How do you handle rejection?",
-+    "Describe how you uncover customer needs.",
-+    "What motivates you to hit goals?"
-+  ]
-+};
-+
-+const roleEmphasisMap = {
-+  General: "Emphasize adaptability, reliability, and communication.",
-+  Retail: "Emphasize customer empathy, pace, and teamwork on the floor.",
-+  "Customer Service": "Emphasize listening, de-escalation, and solution focus.",
-+  Internship: "Emphasize learning speed, coachability, and initiative.",
-+  Sales: "Emphasize relationship building, resilience, and persuasion."
-+};
-+
- let sessions = 0;
- let confidence = 50;
-+let selectedRole = "General";
-+let currentQuestion = "";
-+let mockQuestions = [];
-+let mockPosition = 0;
-+let mockScore = 0;
-+let timerValue = 0;
-+let timerHandle = null;
-+let stories = JSON.parse(localStorage.getItem("fh_story_bank") || "[]");
-+let historyLog = JSON.parse(localStorage.getItem("fh_history") || "[]");
-+let savedPitchValue = localStorage.getItem("fh_saved_pitch") || "";
-+let latestFeedback = null;
- 
- function showSection(id) {
-   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-   document.getElementById(id).classList.add('active');
- }
- 
-+function setRole(role) {
-+  selectedRole = role;
-+  document.getElementById("currentRole").innerText = role;
-+  bumpProgress(1, `Role switched to ${role}`);
-+}
-+
- function updateProgress() {
-   document.getElementById("sessions").innerText = sessions;
-   document.getElementById("confidence").innerText = confidence;
-+  document.getElementById("currentRole").innerText = selectedRole;
-+  renderHistory();
-+  drawChart();
-+}
-+
-+function bumpProgress(confDelta, action) {
-+  sessions += 1;
-+  confidence = Math.min(100, Math.max(0, confidence + confDelta));
-+  historyLog.push({
-+    at: new Date().toLocaleString(),
-+    action,
-+    confidence
-+  });
-+  if (historyLog.length > 40) {
-+    historyLog = historyLog.slice(-40);
-+  }
-+  localStorage.setItem("fh_history", JSON.stringify(historyLog));
-+  updateProgress();
-+}
-+
-+function renderHistory() {
-+  const list = document.getElementById("historyList");
-+  if (!historyLog.length) {
-+    list.innerText = "No sessions yet.";
-+    return;
-+  }
-+
-+  const latest = historyLog.slice(-8).reverse().map(item =>
-+    `• ${item.at}: ${item.action} (confidence ${item.confidence}%)`
-+  );
-+  list.innerHTML = `<ul class="tight">${latest.map(i => `<li>${i.slice(2)}</li>`).join("")}</ul>`;
-+}
-+
-+function drawChart() {
-+  const canvas = document.getElementById("progressChart");
-+  const ctx = canvas.getContext("2d");
-+  ctx.clearRect(0, 0, canvas.width, canvas.height);
-+
-+  ctx.fillStyle = "#ffffff";
-+  ctx.fillRect(0, 0, canvas.width, canvas.height);
-+
-+  ctx.strokeStyle = "#e2e8f0";
-+  ctx.lineWidth = 1;
-+  for (let y = 20; y <= 200; y += 45) {
-+    ctx.beginPath();
-+    ctx.moveTo(30, y);
-+    ctx.lineTo(canvas.width - 20, y);
-+    ctx.stroke();
-+  }
-+
-+  if (!historyLog.length) {
-+    ctx.fillStyle = "#64748b";
-+    ctx.fillText("Your confidence trend appears here after activity.", 36, 115);
-+    return;
-+  }
-+
-+  const maxPoints = Math.min(20, historyLog.length);
-+  const points = historyLog.slice(-maxPoints).map(item => item.confidence);
-+  const xGap = (canvas.width - 70) / (points.length - 1 || 1);
-+
-+  ctx.strokeStyle = "#4f46e5";
-+  ctx.lineWidth = 2;
-+  ctx.beginPath();
-+
-+  points.forEach((value, i) => {
-+    const x = 35 + i * xGap;
-+    const y = 200 - (value * 1.7);
-+    if (i === 0) {
-+      ctx.moveTo(x, y);
-+    } else {
-+      ctx.lineTo(x, y);
-+    }
-+  });
-+
-+  ctx.stroke();
-+
-+  points.forEach((value, i) => {
-+    const x = 35 + i * xGap;
-+    const y = 200 - (value * 1.7);
-+    ctx.fillStyle = "#4338ca";
-+    ctx.beginPath();
-+    ctx.arc(x, y, 3, 0, Math.PI * 2);
-+    ctx.fill();
-+  });
- }
- 
- function analyzeStrength() {
--  const input = document.getElementById("experienceInput").value.toLowerCase();
-+  const input = document.getElementById("experienceInput").value.trim().toLowerCase();
-+  if (!input) {
-+    document.getElementById("strengthResult").innerText = "Please enter an experience first.";
-+    document.getElementById("framingResult").innerText = "";
-+    document.getElementById("roleEmphasis").innerText = "";
-+    return;
-+  }
- 
-   let strength = "Responsibility and reliability";
-   let framing = "This experience shows commitment and consistency.";
- 
-   if (input.includes("captain") || input.includes("leader")) {
-     strength = "Leadership and communication";
-     framing = "This shows I can guide a team and stay calm under pressure.";
--  } else if (input.includes("job") || input.includes("work")) {
-+  } else if (input.includes("job") || input.includes("work") || input.includes("shift")) {
-     strength = "Work ethic and time management";
-     framing = "This shows I balance responsibilities and deliver results.";
--  } else if (input.includes("volunteer")) {
-+  } else if (input.includes("volunteer") || input.includes("community")) {
-     strength = "Initiative and community involvement";
-     framing = "This shows I take initiative and care about impact.";
-+  } else if (input.includes("project") || input.includes("class")) {
-+    strength = "Problem solving and follow-through";
-+    framing = "This shows I can break down problems and execute consistently.";
-   }
- 
-   document.getElementById("strengthResult").innerText = strength;
-   document.getElementById("framingResult").innerText = framing;
-+  document.getElementById("roleEmphasis").innerText = roleEmphasisMap[selectedRole];
-+  bumpProgress(3, "Strength Builder analysis completed");
-+  generateNextRecommendation();
-+}
- 
--  sessions++;
--  confidence += 3;
--  if (confidence > 100) confidence = 100;
-+function generateQuestion() {
-+  const questions = roleQuestionPacks[selectedRole] || roleQuestionPacks.General;
-+  currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-+  document.getElementById("questionResult").innerText = currentQuestion;
-+  bumpProgress(2, `${selectedRole} practice question generated`);
-+}
- 
--  updateProgress();
-+function scoreAnswer() {
-+  const answer = document.getElementById("answerInput").value.trim();
-+  if (!currentQuestion) {
-+    document.getElementById("feedbackScores").innerText = "Generate a question first.";
-+    return;
-+  }
-+  if (!answer) {
-+    document.getElementById("feedbackScores").innerText = "Type an answer to receive feedback.";
-+    return;
-+  }
-+
-+  const words = answer.split(/\s+/).filter(Boolean).length;
-+  const clarity = Math.min(100, Math.max(30, Math.round(55 + Math.min(words, 120) * 0.25)));
-+  const hasSTAR = /(situation|task|action|result)/i.test(answer);
-+  const structure = hasSTAR ? 90 : 62;
-+  const confidenceTerms = ["I led", "I delivered", "I improved", "I solved", "I created", "I achieved"];
-+  const confidenceHits = confidenceTerms.reduce((acc, term) => acc + (answer.toLowerCase().includes(term.toLowerCase()) ? 1 : 0), 0);
-+  const confidenceScore = Math.min(95, 55 + confidenceHits * 12);
-+  const overall = Math.round((clarity + structure + confidenceScore) / 3);
-+
-+  latestFeedback = { clarity, structure, confidenceScore, overall };
-+
-+  document.getElementById("feedbackScores").innerHTML = `
-+    Clarity: <strong>${clarity}/100</strong><br>
-+    Structure (STAR): <strong>${structure}/100</strong><br>
-+    Confidence language: <strong>${confidenceScore}/100</strong><br>
-+    Overall: <strong>${overall}/100</strong>
-+  `;
-+
-+  const improved = `Improved draft: In my ${selectedRole.toLowerCase()} experience, I handled a specific situation where expectations were high. I took ownership, coordinated the right actions, and delivered a measurable result. This shows I can add value quickly in this role.`;
-+  document.getElementById("improvedAnswer").innerText = improved;
-+
-+  bumpProgress(4, `Answer feedback scored (${overall}/100)`);
-+  generateNextRecommendation();
- }
- 
--function generateQuestion() {
--  const questions = [
--    "Tell me about yourself.",
--    "Why do you want this job?",
--    "Describe a time you worked on a team.",
--    "What is one challenge you overcame?",
--    "Why should we hire you?"
--  ];
-+function reframeWeakness() {
-+  const weakness = document.getElementById("weaknessInput").value.trim();
-+  if (!weakness) {
-+    document.getElementById("reframeResult").innerText = "Enter a concern to reframe.";
-+    return;
-+  }
-+
-+  const reframed = `A growth area for me has been ${weakness.toLowerCase()}. I've been improving by preparing structured examples, practicing short mock responses, and tracking progress each week. This has made me more confident and effective in interviews.`;
-+  document.getElementById("reframeResult").innerText = reframed;
-+  bumpProgress(2, "Weakness reframed into strength narrative");
-+}
- 
--  const random = questions[Math.floor(Math.random() * questions.length)];
--  document.getElementById("questionResult").innerText = random;
-+function buildPitch() {
-+  const bg = document.getElementById("pitchBackground").value.trim();
-+  const st = document.getElementById("pitchStrengths").value.trim();
-+  const why = document.getElementById("pitchWhyRole").value.trim();
- 
--  sessions++;
--  confidence += 2;
--  if (confidence > 100) confidence = 100;
-+  if (!bg || !st || !why) {
-+    document.getElementById("pitchOutput").innerText = "Complete all three fields to generate your pitch.";
-+    return;
-+  }
- 
--  updateProgress();
-+  const pitch = `I’m ${bg}. My key strengths are ${st}. I’m excited about this ${selectedRole.toLowerCase()} opportunity because ${why}. I’m ready to contribute immediately and keep learning fast.`;
-+  document.getElementById("pitchOutput").innerText = pitch;
-+  bumpProgress(3, "Tell-me-about-yourself pitch built");
- }
- 
--function startPerformance() {
--  const questions = [
--    "Tell me about yourself.",
--    "Describe a leadership experience.",
--    "How do you handle stress?",
--    "What makes you a good team member?",
--    "What is one weakness you’re improving?"
-+function savePitch() {
-+  const pitch = document.getElementById("pitchOutput").innerText.trim();
-+  if (!pitch || pitch.startsWith("Complete all three")) {
-+    document.getElementById("savedPitch").innerText = "Create a pitch first, then save it.";
-+    return;
-+  }
-+
-+  savedPitchValue = pitch;
-+  localStorage.setItem("fh_saved_pitch", savedPitchValue);
-+  document.getElementById("savedPitch").innerText = savedPitchValue;
-+  bumpProgress(1, "Pitch saved");
-+}
-+
-+function startMockInterview() {
-+  const base = roleQuestionPacks[selectedRole] || roleQuestionPacks.General;
-+  mockQuestions = [...base].sort(() => Math.random() - 0.5).slice(0, 5);
-+  mockPosition = 0;
-+  mockScore = 0;
-+  document.getElementById("mockSummary").innerText = "Round started. Answer each prompt before moving on.";
-+  nextMockQuestion();
-+  bumpProgress(2, "Timed mock interview started");
-+}
-+
-+function nextMockQuestion() {
-+  if (!mockQuestions.length) {
-+    document.getElementById("performanceQuestion").innerText = "Start a round first.";
-+    return;
-+  }
-+
-+  if (mockPosition >= mockQuestions.length) {
-+    stopTimer();
-+    const final = Math.round(mockScore / mockQuestions.length);
-+    document.getElementById("performanceQuestion").innerText = "Round complete.";
-+    document.getElementById("mockSummary").innerText = `Final score: ${final}/100. Focus next on concise STAR answers and measurable outcomes.`;
-+    generateNextRecommendation();
-+    return;
-+  }
-+
-+  const q = mockQuestions[mockPosition];
-+  document.getElementById("mockIndex").innerText = mockPosition + 1;
-+  document.getElementById("performanceQuestion").innerText = `${q} (Answer out loud in 45 seconds)`;
-+
-+  const questionScore = 65 + Math.floor(Math.random() * 31);
-+  mockScore += questionScore;
-+  document.getElementById("mockScore").innerText = Math.round(mockScore / (mockPosition + 1));
-+  mockPosition += 1;
-+  startTimer(45);
-+  bumpProgress(2, "Mock interview question completed");
-+}
-+
-+function startTimer(seconds) {
-+  stopTimer();
-+  timerValue = seconds;
-+  document.getElementById("timer").innerText = timerValue;
-+  timerHandle = setInterval(() => {
-+    timerValue -= 1;
-+    document.getElementById("timer").innerText = Math.max(0, timerValue);
-+    if (timerValue <= 0) {
-+      stopTimer();
-+    }
-+  }, 1000);
-+}
-+
-+function stopTimer() {
-+  if (timerHandle) {
-+    clearInterval(timerHandle);
-+    timerHandle = null;
-+  }
-+}
-+
-+function addStory() {
-+  const theme = document.getElementById("storyTheme").value;
-+  const text = document.getElementById("storyText").value.trim();
-+  if (!text) {
-+    return;
-+  }
-+
-+  stories.push({ theme, text, at: new Date().toLocaleDateString() });
-+  localStorage.setItem("fh_story_bank", JSON.stringify(stories));
-+  document.getElementById("storyText").value = "";
-+  renderStories();
-+  bumpProgress(2, `Story added (${theme})`);
-+}
-+
-+function renderStories() {
-+  const list = document.getElementById("storyList");
-+  if (!stories.length) {
-+    list.innerText = "No stories saved yet.";
-+    return;
-+  }
-+
-+  list.innerHTML = stories.slice(-10).reverse().map((story) =>
-+    `<div><span class="tag">${story.theme}</span> ${story.text} <small>(${story.at})</small></div>`
-+  ).join("");
-+}
-+
-+function suggestStory() {
-+  const question = document.getElementById("storyQuestion").value.trim().toLowerCase();
-+  if (!question || !stories.length) {
-+    document.getElementById("storySuggestion").innerText = "Add stories and type a question for matching.";
-+    return;
-+  }
-+
-+  const themeRules = [
-+    { key: "lead", theme: "Leadership" },
-+    { key: "team", theme: "Teamwork" },
-+    { key: "conflict", theme: "Conflict" },
-+    { key: "fail", theme: "Failure" },
-+    { key: "problem", theme: "Problem Solving" },
-+    { key: "customer", theme: "Customer Success" }
-   ];
- 
--  let random = questions[Math.floor(Math.random() * questions.length)];
--  document.getElementById("performanceQuestion").innerText = random + " (Answer out loud!)";
-+  let targetTheme = "Teamwork";
-+  for (const rule of themeRules) {
-+    if (question.includes(rule.key)) {
-+      targetTheme = rule.theme;
-+      break;
-+    }
-+  }
-+
-+  const candidate = [...stories].reverse().find(s => s.theme === targetTheme) || stories[stories.length - 1];
-+  document.getElementById("storySuggestion").innerText = `Use this ${candidate.theme} story: ${candidate.text}`;
-+  bumpProgress(1, "Story recommendation generated");
-+}
- 
--  sessions++;
--  confidence += 5;
--  if (confidence > 100) confidence = 100;
-+function matchJobDescription() {
-+  const text = document.getElementById("jobDescription").value.trim().toLowerCase();
-+  if (!text) {
-+    document.getElementById("jdSkills").innerText = "Paste a job description first.";
-+    document.getElementById("jdEmphasis").innerText = "";
-+    return;
-+  }
- 
--  updateProgress();
-+  const skillsMap = {
-+    communication: ["communication", "communicate", "present"],
-+    teamwork: ["team", "collaborate", "cross-functional"],
-+    customer_focus: ["customer", "client", "service"],
-+    problem_solving: ["problem", "analyze", "solution"],
-+    leadership: ["lead", "mentor", "manage"],
-+    sales: ["sell", "revenue", "target", "quota"],
-+    organization: ["organize", "detail", "prioritize", "multitask"]
-+  };
-+
-+  const found = [];
-+  Object.entries(skillsMap).forEach(([skill, terms]) => {
-+    if (terms.some(term => text.includes(term))) {
-+      found.push(skill.replace("_", " "));
-+    }
-+  });
-+
-+  const top = found.length ? found.slice(0, 5) : ["communication", "teamwork", "problem solving"];
-+  document.getElementById("jdSkills").innerHTML = top.map(skill => `<span class="tag">${skill}</span>`).join(" ");
-+
-+  const emphasis = `In your interview, prioritize examples that prove ${top.slice(0, 3).join(", ")}. Quantify outcomes where possible and tie results directly to ${selectedRole.toLowerCase()} goals.`;
-+  document.getElementById("jdEmphasis").innerText = emphasis;
-+
-+  bumpProgress(3, "Job description analyzed");
-+  generateNextRecommendation();
- }
--</script>
- </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FirstHire – Interview Performance System</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+
+<style>
+body { margin:0; font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; display:flex; height:100vh; }
+.sidebar { width:220px; background:white; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; padding:1rem; }
+.sidebar a { margin:0.5rem 0; text-decoration:none; color:#1e293b; font-weight:600; cursor:pointer; }
+.sidebar a.active { color:#0ea5e9; }
+.main { flex:1; padding:2rem; overflow-y:auto; }
+.card-box { background:white; padding:1.5rem; border-radius:12px; border:1px solid #e5e7eb; margin-top:1.5rem; }
+.result-label { font-weight:600; margin-top:1rem; }
+.progress-box { margin-top:2rem; padding:1rem; background:#eef2ff; border-radius:10px; text-align:center; }
+button { margin-top:1rem; }
+textarea,input { width:100%; margin-top:0.5rem; padding:0.5rem; border-radius:8px; border:1px solid #cbd5e1; }
+footer { margin-top:2rem; padding:1rem 0; text-align:center; color:#64748b; }
+@media (max-width:768px){ body{flex-direction:column;} .sidebar{width:100%;flex-direction:row; overflow-x:auto;} .sidebar a{margin:0 1rem;} .main{padding:1rem;} }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<strong>FirstHire</strong>
+<a class="active" onclick="showSection('home', this)">Home</a>
+<a onclick="showSection('strength', this)">Strength Builder</a>
+<a onclick="showSection('practice', this)">Practice</a>
+<a onclick="showSection('performance', this)">Performance</a>
+</div>
+
+<div class="main">
+<!-- HOME -->
+<div id="home" class="section active">
+<h2>Interview Performance System</h2>
+<p>From “I don’t know what to say” to “I’m ready.”</p>
+<div class="progress-box">
+<strong>Sessions Completed:</strong> <span id="sessions">0</span><br>
+<strong>Confidence Score:</strong> <span id="confidence">50</span>%
+<div style="height:10px; background:#cbd5e1; border-radius:5px; margin-top:5px;">
+<div id="confidenceBar" style="width:50%; background:#38bdf8; height:10px; border-radius:5px;"></div>
+</div>
+</div>
+</div>
+
+<!-- STRENGTH BUILDER -->
+<div id="strength" class="section">
+<h2>Strength Builder</h2>
+<p>Enter all your experiences below (one per line):</p>
+<textarea id="experienceInput" rows="5" placeholder="Example: Soccer captain&#10;Part-time cashier&#10;Volunteering at library"></textarea>
+<button onclick="analyzeStrength()">Analyze</button>
+<div class="card-box">
+<div class="result-label">Transferable Strength:</div>
+<div id="strengthResult"></div>
+<div class="result-label">Interview Framing:</div>
+<div id="framingResult"></div>
+</div>
+<button onclick="exportPrep()">⬇ Download Prep Sheet</button>
+</div>
+
+<!-- PRACTICE -->
+<div id="practice" class="section">
+<h2>Practice Arena</h2>
+<p>Generate a random interview question:</p>
+<button onclick="generateQuestion()">Generate Question</button>
+<div class="card-box">
+<div id="questionResult"></div>
+</div>
+</div>
+
+<!-- PERFORMANCE -->
+<div id="performance" class="section">
+<h2>Performance Mode</h2>
+<p>Answer rapid-fire questions out loud!</p>
+<button onclick="startPerformance()">Start Session</button>
+<div class="card-box">
+<div id="performanceQuestion"></div>
+</div>
+</div>
+
+<footer>
+FirstHire • Practice. Position. Perform.
+</footer>
+</div>
+
+<script>
+let sessions = 0;
+let confidence = 50;
+let experiences = [];
+let lastQuestions = [];
+
+function showSection(id, el){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateProgress(){
+  document.getElementById("sessions").innerText = sessions;
+  document.getElementById("confidence").innerText = confidence;
+  document.getElementById("confidenceBar").style.width = confidence + "%";
+}
+
+function analyzeStrength(){
+  experiences = document.getElementById("experienceInput").value.split("\n").filter(e=>e.trim()!="");
+  if(experiences.length===0){ alert("Please enter at least one experience."); return; }
+
+  let strengthOutput="", framingOutput="";
+  experiences.forEach(exp=>{
+    const expLower = exp.toLowerCase();
+    let str="Responsibility and reliability", frame="Shows commitment and consistency.";
+
+    if(expLower.includes("captain")||expLower.includes("leader")){
+      str="Leadership and communication"; frame="Shows ability to guide a team and stay calm under pressure.";
+    } else if(expLower.includes("job")||expLower.includes("work")||expLower.includes("cashier")){
+      str="Work ethic and time management"; frame="Demonstrates balancing responsibilities and delivering results.";
+    } else if(expLower.includes("volunteer")){
+      str="Initiative and community involvement"; frame="Shows initiative and a sense of responsibility.";
+    }
+
+    strengthOutput += "- "+str+" ("+exp+")<br>";
+    framingOutput += "- "+frame+"<br>";
+  });
+
+  document.getElementById("strengthResult").innerHTML = strengthOutput;
+  document.getElementById("framingResult").innerHTML = framingOutput;
+
+  sessions++; confidence=Math.min(confidence+3,100); updateProgress();
+  alert("🎉 Strengths analyzed! +3 confidence");
+}
+
+function generateQuestion(){
+  const questions=[
+    "Tell me about yourself.","Why do you want this job?","Describe a time you worked on a team.",
+    "What is one challenge you overcame?","Why should we hire you?","What is your greatest strength?",
+    "Describe a leadership experience.","How do you handle stress?","Why this company?",
+    "What are your goals for the next 5 years?"
+  ];
+
+  let question = questions[Math.floor(Math.random()*questions.length)];
+  while(lastQuestions.includes(question) && lastQuestions.length<questions.length){ question = questions[Math.floor(Math.random()*questions.length)]; }
+  lastQuestions.push(question); if(lastQuestions.length>5) lastQuestions.shift();
+  document.getElementById("questionResult").innerText = question;
+
+  sessions++; confidence=Math.min(confidence+2,100); updateProgress();
+  alert("✅ Question generated! +2 confidence");
+}
+
+function startPerformance(){
+  const questions=[
+    "Tell me about yourself.","Describe a leadership experience.","How do you handle stress?",
+    "What makes you a good team member?","What is one weakness you’re improving?",
+    "Why should we hire you?","Describe a project you are proud of.",
+    "How do you handle conflict?","What motivates you?","Give an example of problem-solving."
+  ];
+
+  let question = questions[Math.floor(Math.random()*questions.length)];
+  document.getElementById("performanceQuestion").innerText = question+" (Answer out loud!)";
+
+  sessions++; confidence=Math.min(confidence+5,100); updateProgress();
+  alert("💪 Performance mode! +5 confidence");
+}
+
+function exportPrep(){
+  if(experiences.length===0){ alert("No experiences analyzed yet."); return; }
+  let content="FirstHire Prep Sheet\n\nStrengths & Framing:\n";
+  experiences.forEach((exp,i)=>{
+    content += "- "+exp+"\n  Transferable Strength: "+document.getElementById("strengthResult").children[i].innerText+"\n  Framing: "+document.getElementById("framingResult").children[i].innerText+"\n\n";
+  });
+
+  const blob = new Blob([content],{type:"text/plain"});
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "FirstHire_Prep.txt";
+  link.click();
+}
+</script>
+
+</body>
 </html>
