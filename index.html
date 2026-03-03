@@ -2,182 +2,150 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FirstHire – Interview Performance System</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerQuest - Gamified Job Hunting</title>
 <style>
-body { margin:0; font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; display:flex; height:100vh; }
-.sidebar { width:220px; background:white; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; padding:1rem; }
-.sidebar a { margin:0.5rem 0; text-decoration:none; color:#1e293b; font-weight:600; cursor:pointer; }
-.sidebar a.active { color:#0ea5e9; }
-.main { flex:1; padding:2rem; overflow-y:auto; }
-.card-box { background:white; padding:1.5rem; border-radius:12px; border:1px solid #e5e7eb; margin-top:1.5rem; }
-.result-label { font-weight:600; margin-top:1rem; }
-.progress-box { margin-top:2rem; padding:1rem; background:#eef2ff; border-radius:10px; text-align:center; }
-button { margin-top:1rem; }
-textarea,input { width:100%; margin-top:0.5rem; padding:0.5rem; border-radius:8px; border:1px solid #cbd5e1; }
-footer { margin-top:2rem; padding:1rem 0; text-align:center; color:#64748b; }
-@media (max-width:768px){ body{flex-direction:column;} .sidebar{width:100%;flex-direction:row; overflow-x:auto;} .sidebar a{margin:0 1rem;} .main{padding:1rem;} }
+  /* Global Styles */
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #0d0d0d;
+    color: #fff;
+  }
+
+  header {
+    background: #111;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #00ffcc;
+  }
+
+  header h1 {
+    color: #00ffcc;
+    margin: 0;
+  }
+
+  .notifications {
+    background: #111;
+    padding: 5px 10px;
+    border: 1px solid #00ffcc;
+    border-radius: 5px;
+  }
+
+  main {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .dashboard, .leaderboard {
+    background: #1a1a1a;
+    border: 2px solid #00ffcc;
+    border-radius: 10px;
+    padding: 20px;
+    flex: 1 1 300px;
+  }
+
+  .xp-bar {
+    background: #333;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .xp-progress {
+    background: #00ffcc;
+    height: 20px;
+    width: 60%;
+  }
+
+  .badges, .job-cards {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .badge, .job-card {
+    background: #111;
+    border: 1px solid #00ffcc;
+    border-radius: 10px;
+    padding: 10px;
+    width: 150px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  .badge:hover, .job-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #00ffcc;
+  }
+
+  .leaderboard ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .leaderboard li {
+    padding: 5px 0;
+    border-bottom: 1px solid #00ffcc;
+  }
 </style>
 </head>
 <body>
+<header>
+  <h1>CareerQuest</h1>
+  <div class="notifications">🔔 3 New Jobs</div>
+</header>
 
-<div class="sidebar">
-<strong>FirstHire</strong>
-<a class="active" onclick="showSection('home', this)">Home</a>
-<a onclick="showSection('strength', this)">Strength Builder</a>
-<a onclick="showSection('practice', this)">Practice</a>
-<a onclick="showSection('performance', this)">Performance</a>
-</div>
+<main>
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <h2>Dashboard</h2>
+    <p>Level 5 - XP Progress</p>
+    <div class="xp-bar">
+      <div class="xp-progress"></div>
+    </div>
 
-<div class="main">
-<!-- HOME -->
-<div id="home" class="section active">
-<h2>Interview Performance System</h2>
-<p>From “I don’t know what to say” to “I’m ready.”</p>
-<div class="progress-box">
-<strong>Sessions Completed:</strong> <span id="sessions">0</span><br>
-<strong>Confidence Score:</strong> <span id="confidence">50</span>%
-<div style="height:10px; background:#cbd5e1; border-radius:5px; margin-top:5px;">
-<div id="confidenceBar" style="width:50%; background:#38bdf8; height:10px; border-radius:5px;"></div>
-</div>
-</div>
-</div>
+    <h3>Achievements</h3>
+    <div class="badges">
+      <div class="badge">🛡 Applied 5 Jobs</div>
+      <div class="badge">⚡ Skill Certified</div>
+      <div class="badge">🏆 Top Contributor</div>
+    </div>
 
-<!-- STRENGTH BUILDER -->
-<div id="strength" class="section">
-<h2>Strength Builder</h2>
-<p>Enter all your experiences below (one per line):</p>
-<textarea id="experienceInput" rows="5" placeholder="Example: Soccer captain&#10;Part-time cashier&#10;Volunteering at library"></textarea>
-<button onclick="analyzeStrength()">Analyze</button>
-<div class="card-box">
-<div class="result-label">Transferable Strength:</div>
-<div id="strengthResult"></div>
-<div class="result-label">Interview Framing:</div>
-<div id="framingResult"></div>
-</div>
-<button onclick="exportPrep()">⬇ Download Prep Sheet</button>
-</div>
+    <h3>Job Opportunities</h3>
+    <div class="job-cards">
+      <div class="job-card">
+        <strong>Frontend Developer</strong>
+        <p>Company: TechCorp</p>
+        <p>Skills: HTML, CSS, JS</p>
+      </div>
+      <div class="job-card">
+        <strong>Graphic Designer</strong>
+        <p>Company: Creatify</p>
+        <p>Skills: Photoshop, Illustrator</p>
+      </div>
+      <div class="job-card">
+        <strong>Data Analyst</strong>
+        <p>Company: DataWorks</p>
+        <p>Skills: Excel, SQL</p>
+      </div>
+    </div>
+  </div>
 
-<!-- PRACTICE -->
-<div id="practice" class="section">
-<h2>Practice Arena</h2>
-<p>Generate a random interview question:</p>
-<button onclick="generateQuestion()">Generate Question</button>
-<div class="card-box">
-<div id="questionResult"></div>
-</div>
-</div>
-
-<!-- PERFORMANCE -->
-<div id="performance" class="section">
-<h2>Performance Mode</h2>
-<p>Answer rapid-fire questions out loud!</p>
-<button onclick="startPerformance()">Start Session</button>
-<div class="card-box">
-<div id="performanceQuestion"></div>
-</div>
-</div>
-
-<footer>
-FirstHire • Practice. Position. Perform.
-</footer>
-</div>
-
-<script>
-let sessions = 0;
-let confidence = 50;
-let experiences = [];
-let lastQuestions = [];
-
-function showSection(id, el){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function updateProgress(){
-  document.getElementById("sessions").innerText = sessions;
-  document.getElementById("confidence").innerText = confidence;
-  document.getElementById("confidenceBar").style.width = confidence + "%";
-}
-
-function analyzeStrength(){
-  experiences = document.getElementById("experienceInput").value.split("\n").filter(e=>e.trim()!="");
-  if(experiences.length===0){ alert("Please enter at least one experience."); return; }
-
-  let strengthOutput="", framingOutput="";
-  experiences.forEach(exp=>{
-    const expLower = exp.toLowerCase();
-    let str="Responsibility and reliability", frame="Shows commitment and consistency.";
-
-    if(expLower.includes("captain")||expLower.includes("leader")){
-      str="Leadership and communication"; frame="Shows ability to guide a team and stay calm under pressure.";
-    } else if(expLower.includes("job")||expLower.includes("work")||expLower.includes("cashier")){
-      str="Work ethic and time management"; frame="Demonstrates balancing responsibilities and delivering results.";
-    } else if(expLower.includes("volunteer")){
-      str="Initiative and community involvement"; frame="Shows initiative and a sense of responsibility.";
-    }
-
-    strengthOutput += "- "+str+" ("+exp+")<br>";
-    framingOutput += "- "+frame+"<br>";
-  });
-
-  document.getElementById("strengthResult").innerHTML = strengthOutput;
-  document.getElementById("framingResult").innerHTML = framingOutput;
-
-  sessions++; confidence=Math.min(confidence+3,100); updateProgress();
-  alert("🎉 Strengths analyzed! +3 confidence");
-}
-
-function generateQuestion(){
-  const questions=[
-    "Tell me about yourself.","Why do you want this job?","Describe a time you worked on a team.",
-    "What is one challenge you overcame?","Why should we hire you?","What is your greatest strength?",
-    "Describe a leadership experience.","How do you handle stress?","Why this company?",
-    "What are your goals for the next 5 years?"
-  ];
-
-  let question = questions[Math.floor(Math.random()*questions.length)];
-  while(lastQuestions.includes(question) && lastQuestions.length<questions.length){ question = questions[Math.floor(Math.random()*questions.length)]; }
-  lastQuestions.push(question); if(lastQuestions.length>5) lastQuestions.shift();
-  document.getElementById("questionResult").innerText = question;
-
-  sessions++; confidence=Math.min(confidence+2,100); updateProgress();
-  alert("✅ Question generated! +2 confidence");
-}
-
-function startPerformance(){
-  const questions=[
-    "Tell me about yourself.","Describe a leadership experience.","How do you handle stress?",
-    "What makes you a good team member?","What is one weakness you’re improving?",
-    "Why should we hire you?","Describe a project you are proud of.",
-    "How do you handle conflict?","What motivates you?","Give an example of problem-solving."
-  ];
-
-  let question = questions[Math.floor(Math.random()*questions.length)];
-  document.getElementById("performanceQuestion").innerText = question+" (Answer out loud!)";
-
-  sessions++; confidence=Math.min(confidence+5,100); updateProgress();
-  alert("💪 Performance mode! +5 confidence");
-}
-
-function exportPrep(){
-  if(experiences.length===0){ alert("No experiences analyzed yet."); return; }
-  let content="FirstHire Prep Sheet\n\nStrengths & Framing:\n";
-  experiences.forEach((exp,i)=>{
-    content += "- "+exp+"\n  Transferable Strength: "+document.getElementById("strengthResult").children[i].innerText+"\n  Framing: "+document.getElementById("framingResult").children[i].innerText+"\n\n";
-  });
-
-  const blob = new Blob([content],{type:"text/plain"});
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "FirstHire_Prep.txt";
-  link.click();
-}
-</script>
-
+  <!-- Leaderboard -->
+  <div class="leaderboard">
+    <h2>Leaderboard</h2>
+    <ul>
+      <li>JaneDoe - Level 8</li>
+      <li>JohnSmith - Level 7</li>
+      <li>Alex99 - Level 6</li>
+      <li>You - Level 5</li>
+    </ul>
+  </div>
+</main>
 </body>
 </html>
