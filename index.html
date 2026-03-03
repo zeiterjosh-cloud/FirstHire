@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CareerQuest - Gamified Job Hunting</title>
 <style>
-  /* Global Styles */
   body {
     margin: 0;
     font-family: 'Arial', sans-serif;
@@ -22,11 +21,7 @@
     border-bottom: 2px solid #00ffcc;
   }
 
-  header h1 {
-    color: #00ffcc;
-    margin: 0;
-  }
-
+  header h1 { color: #00ffcc; margin: 0; }
   .notifications {
     background: #111;
     padding: 5px 10px;
@@ -41,7 +36,7 @@
     gap: 20px;
   }
 
-  .dashboard, .leaderboard {
+  .dashboard, .leaderboard, .quests {
     background: #1a1a1a;
     border: 2px solid #00ffcc;
     border-radius: 10px;
@@ -49,97 +44,108 @@
     flex: 1 1 300px;
   }
 
-  .xp-bar {
-    background: #333;
-    border-radius: 20px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
+  .xp-bar { background: #333; border-radius: 20px; overflow: hidden; margin-bottom: 10px; }
+  .xp-progress { background: #00ffcc; height: 20px; width: 60%; transition: width 0.5s; }
 
-  .xp-progress {
-    background: #00ffcc;
-    height: 20px;
-    width: 60%;
-  }
-
-  .badges, .job-cards {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .badge, .job-card {
+  .badges, .job-cards, .quest-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge, .job-card, .quest {
     background: #111;
     border: 1px solid #00ffcc;
     border-radius: 10px;
     padding: 10px;
     width: 150px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
 
-  .badge:hover, .job-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px #00ffcc;
+  .badge.unlocked { background: #00ffcc; color: #111; }
+  .badge:hover, .job-card:hover, .quest:hover { transform: scale(1.05); box-shadow: 0 0 10px #00ffcc; }
+
+  .leaderboard ul, .quest-list ul { list-style: none; padding: 0; }
+  .leaderboard li, .quest-list li { padding: 5px 0; border-bottom: 1px solid #00ffcc; }
+
+  .modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a1a;
+    padding: 20px;
+    border: 2px solid #00ffcc;
+    border-radius: 10px;
+    z-index: 1000;
   }
 
-  .leaderboard ul {
-    list-style: none;
-    padding: 0;
-  }
+  .modal button { margin-top: 10px; padding: 5px 10px; border: none; background: #00ffcc; color: #111; cursor: pointer; border-radius: 5px; }
 
-  .leaderboard li {
-    padding: 5px 0;
-    border-bottom: 1px solid #00ffcc;
+  .overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.7);
+    z-index: 500;
   }
 </style>
 </head>
 <body>
+
 <header>
   <h1>CareerQuest</h1>
-  <div class="notifications">🔔 3 New Jobs</div>
+  <div class="notifications" id="notification">🔔 Welcome! Complete quests to earn XP!</div>
 </header>
 
 <main>
   <!-- Dashboard -->
   <div class="dashboard">
     <h2>Dashboard</h2>
-    <p>Level 5 - XP Progress</p>
-    <div class="xp-bar">
-      <div class="xp-progress"></div>
-    </div>
+    <p>Level <span id="level">5</span> - XP Progress</p>
+    <div class="xp-bar"><div class="xp-progress" id="xpBar"></div></div>
 
     <h3>Achievements</h3>
-    <div class="badges">
-      <div class="badge">🛡 Applied 5 Jobs</div>
-      <div class="badge">⚡ Skill Certified</div>
-      <div class="badge">🏆 Top Contributor</div>
+    <div class="badges" id="badges">
+      <div class="badge" data-xp="10">🛡 Applied 5 Jobs</div>
+      <div class="badge" data-xp="20">⚡ Skill Certified</div>
+      <div class="badge" data-xp="30">🏆 Top Contributor</div>
     </div>
 
     <h3>Job Opportunities</h3>
     <div class="job-cards">
-      <div class="job-card">
+      <div class="job-card" data-xp="10">
         <strong>Frontend Developer</strong>
         <p>Company: TechCorp</p>
         <p>Skills: HTML, CSS, JS</p>
+        <button class="applyBtn">Apply</button>
       </div>
-      <div class="job-card">
+      <div class="job-card" data-xp="10">
         <strong>Graphic Designer</strong>
         <p>Company: Creatify</p>
         <p>Skills: Photoshop, Illustrator</p>
+        <button class="applyBtn">Apply</button>
       </div>
-      <div class="job-card">
+      <div class="job-card" data-xp="10">
         <strong>Data Analyst</strong>
         <p>Company: DataWorks</p>
         <p>Skills: Excel, SQL</p>
+        <button class="applyBtn">Apply</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Quests -->
+  <div class="quests">
+    <h2>Daily Quests</h2>
+    <div class="quest-list" id="questList">
+      <div class="quest" data-xp="5">Apply to 1 job today</div>
+      <div class="quest" data-xp="5">Complete a skill quiz</div>
+      <div class="quest" data-xp="10">Update your profile</div>
     </div>
   </div>
 
   <!-- Leaderboard -->
   <div class="leaderboard">
     <h2>Leaderboard</h2>
-    <ul>
+    <ul id="leaderboardList">
       <li>JaneDoe - Level 8</li>
       <li>JohnSmith - Level 7</li>
       <li>Alex99 - Level 6</li>
@@ -147,5 +153,99 @@
     </ul>
   </div>
 </main>
+
+<div class="overlay" id="overlay"></div>
+<div class="modal" id="modal">
+  <h3 id="modalJobTitle"></h3>
+  <p id="modalJobDesc"></p>
+  <button id="closeModal">Close</button>
+</div>
+
+<script>
+let xp = 60;
+let level = 5;
+
+const xpBar = document.getElementById('xpBar');
+const levelSpan = document.getElementById('level');
+const badges = document.querySelectorAll('.badge');
+const notification = document.getElementById('notification');
+
+function updateXP(amount){
+  xp += amount;
+  if(xp >= 100){
+    xp = xp - 100;
+    level++;
+    levelSpan.textContent = level;
+    showNotification(`🎉 Level Up! You are now Level ${level}`);
+  }
+  xpBar.style.width = xp + '%';
+  unlockBadges();
+}
+
+function unlockBadges(){
+  badges.forEach(badge => {
+    const requiredXP = parseInt(badge.dataset.xp) * 5;
+    if(xp >= requiredXP && !badge.classList.contains('unlocked')){
+      badge.classList.add('unlocked');
+      showNotification(`🏅 Badge Unlocked: ${badge.textContent}`);
+    }
+  });
+}
+
+function showNotification(msg){
+  notification.textContent = msg;
+  setTimeout(()=>{ notification.textContent = '🔔 Complete quests to earn XP!'; }, 3000);
+}
+
+// Job application buttons
+document.querySelectorAll('.applyBtn').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    const card = e.target.parentElement;
+    const title = card.querySelector('strong').textContent;
+    const desc = card.querySelector('p').textContent + ' ...';
+    showModal(title, desc);
+    updateXP(parseInt(card.dataset.xp));
+    markQuestComplete('Apply to 1 job today');
+  });
+});
+
+// Quests
+function markQuestComplete(name){
+  const quests = document.querySelectorAll('.quest');
+  quests.forEach(q=>{
+    if(q.textContent === name && !q.classList.contains('completed')){
+      q.classList.add('completed');
+      q.style.background = '#00ffcc';
+      q.style.color = '#111';
+      updateXP(parseInt(q.dataset.xp));
+      showNotification(`✅ Quest Completed: ${name}`);
+    }
+  });
+}
+
+// Modal
+const modal = document.getElementById('modal');
+const overlay = document.getElementById('overlay');
+const modalJobTitle = document.getElementById('modalJobTitle');
+const modalJobDesc = document.getElementById('modalJobDesc');
+document.getElementById('closeModal').addEventListener('click', closeModal);
+overlay.addEventListener('click', closeModal);
+
+function showModal(title, desc){
+  modalJobTitle.textContent = title;
+  modalJobDesc.textContent = desc;
+  modal.style.display = 'block';
+  overlay.style.display = 'block';
+}
+function closeModal(){
+  modal.style.display = 'none';
+  overlay.style.display = 'none';
+}
+
+// Quest click for XP bonus
+document.querySelectorAll('.quest').forEach(q=>{
+  q.addEventListener('click', ()=> markQuestComplete(q.textContent));
+});
+</script>
 </body>
 </html>
