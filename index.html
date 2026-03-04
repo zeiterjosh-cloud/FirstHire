@@ -3,249 +3,297 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CareerQuest - Gamified Job Hunting</title>
+<title>CareerLaunch - 100% Free</title>
+
 <style>
-  body {
-    margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #0d0d0d;
-    color: #fff;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+font-family:Arial, Helvetica, sans-serif;
+background:#f4f7fb;
+color:#1e293b;
+}
 
-  header {
-    background: #111;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #00ffcc;
-  }
+header{
+background:#1e3a8a;
+color:white;
+padding:20px 8%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
 
-  header h1 { color: #00ffcc; margin: 0; }
-  .notifications {
-    background: #111;
-    padding: 5px 10px;
-    border: 1px solid #00ffcc;
-    border-radius: 5px;
-  }
+header h1{font-size:20px}
+nav a{
+color:white;
+margin-left:15px;
+text-decoration:none;
+font-weight:bold;
+}
 
-  main {
-    display: flex;
-    flex-wrap: wrap;
-    padding: 20px;
-    gap: 20px;
-  }
+section{padding:50px 8%}
 
-  .dashboard, .leaderboard, .quests {
-    background: #1a1a1a;
-    border: 2px solid #00ffcc;
-    border-radius: 10px;
-    padding: 20px;
-    flex: 1 1 300px;
-  }
+.hero{
+text-align:center;
+padding:80px 8%;
+background:#1e3a8a;
+color:white;
+}
 
-  .xp-bar { background: #333; border-radius: 20px; overflow: hidden; margin-bottom: 10px; }
-  .xp-progress { background: #00ffcc; height: 20px; width: 60%; transition: width 0.5s; }
+.hero h2{font-size:32px;margin-bottom:15px}
 
-  .badges, .job-cards, .quest-list { display: flex; gap: 10px; flex-wrap: wrap; }
-  .badge, .job-card, .quest {
-    background: #111;
-    border: 1px solid #00ffcc;
-    border-radius: 10px;
-    padding: 10px;
-    width: 150px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
+.btn{
+background:#14b8a6;
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+margin-top:10px;
+font-weight:bold;
+}
 
-  .badge.unlocked { background: #00ffcc; color: #111; }
-  .badge:hover, .job-card:hover, .quest:hover { transform: scale(1.05); box-shadow: 0 0 10px #00ffcc; }
+input, select, textarea{
+width:100%;
+padding:8px;
+margin-bottom:10px;
+border-radius:5px;
+border:1px solid #ccc;
+}
 
-  .leaderboard ul, .quest-list ul { list-style: none; padding: 0; }
-  .leaderboard li, .quest-list li { padding: 5px 0; border-bottom: 1px solid #00ffcc; }
+.jobs{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+}
 
-  .modal {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #1a1a1a;
-    padding: 20px;
-    border: 2px solid #00ffcc;
-    border-radius: 10px;
-    z-index: 1000;
-  }
+.card{
+background:white;
+padding:15px;
+border-radius:8px;
+box-shadow:0 3px 8px rgba(0,0,0,0.1);
+}
 
-  .modal button { margin-top: 10px; padding: 5px 10px; border: none; background: #00ffcc; color: #111; cursor: pointer; border-radius: 5px; }
+.resume-preview{
+background:white;
+padding:15px;
+border-radius:8px;
+min-height:150px;
+border:1px solid #ccc;
+white-space:pre-line;
+}
 
-  .overlay {
-    display: none;
-    position: fixed;
-    top:0; left:0; width:100%; height:100%;
-    background: rgba(0,0,0,0.7);
-    z-index: 500;
-  }
+.kanban{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+}
+
+.column{
+background:#e2e8f0;
+padding:10px;
+border-radius:8px;
+min-height:150px;
+}
+
+.task{
+background:white;
+padding:8px;
+border-radius:6px;
+margin-bottom:8px;
+cursor:grab;
+}
+
+footer{
+text-align:center;
+padding:20px;
+background:#1e3a8a;
+color:white;
+}
 </style>
 </head>
+
 <body>
 
 <header>
-  <h1>CareerQuest</h1>
-  <div class="notifications" id="notification">🔔 Welcome! Complete quests to earn XP!</div>
+<h1>CareerLaunch</h1>
+<nav>
+<a href="#jobs">Jobs</a>
+<a href="#resume">Resume</a>
+<a href="#tracker">Tracker</a>
+</nav>
 </header>
 
-<main>
-  <!-- Dashboard -->
-  <div class="dashboard">
-    <h2>Dashboard</h2>
-    <p>Level <span id="level">5</span> - XP Progress</p>
-    <div class="xp-bar"><div class="xp-progress" id="xpBar"></div></div>
+<section class="hero">
+<h2>Land Your Dream Job Faster</h2>
+<p>Completely free. No signups. No payments. Works offline.</p>
+<button class="btn" onclick="document.getElementById('jobs').scrollIntoView()">Browse Jobs</button>
+</section>
 
-    <h3>Achievements</h3>
-    <div class="badges" id="badges">
-      <div class="badge" data-xp="10">🛡 Applied 5 Jobs</div>
-      <div class="badge" data-xp="20">⚡ Skill Certified</div>
-      <div class="badge" data-xp="30">🏆 Top Contributor</div>
-    </div>
+<section id="jobs">
+<h2>Job Search</h2>
+<input type="text" id="search" placeholder="Search job title">
+<select id="locationFilter">
+<option value="">All Locations</option>
+<option>Remote</option>
+<option>New York</option>
+<option>San Francisco</option>
+</select>
 
-    <h3>Job Opportunities</h3>
-    <div class="job-cards">
-      <div class="job-card" data-xp="10">
-        <strong>Frontend Developer</strong>
-        <p>Company: TechCorp</p>
-        <p>Skills: HTML, CSS, JS</p>
-        <button class="applyBtn">Apply</button>
-      </div>
-      <div class="job-card" data-xp="10">
-        <strong>Graphic Designer</strong>
-        <p>Company: Creatify</p>
-        <p>Skills: Photoshop, Illustrator</p>
-        <button class="applyBtn">Apply</button>
-      </div>
-      <div class="job-card" data-xp="10">
-        <strong>Data Analyst</strong>
-        <p>Company: DataWorks</p>
-        <p>Skills: Excel, SQL</p>
-        <button class="applyBtn">Apply</button>
-      </div>
-    </div>
-  </div>
+<div class="jobs" id="jobsContainer"></div>
+</section>
 
-  <!-- Quests -->
-  <div class="quests">
-    <h2>Daily Quests</h2>
-    <div class="quest-list" id="questList">
-      <div class="quest" data-xp="5">Apply to 1 job today</div>
-      <div class="quest" data-xp="5">Complete a skill quiz</div>
-      <div class="quest" data-xp="10">Update your profile</div>
-    </div>
-  </div>
+<section id="resume">
+<h2>Resume Builder</h2>
 
-  <!-- Leaderboard -->
-  <div class="leaderboard">
-    <h2>Leaderboard</h2>
-    <ul id="leaderboardList">
-      <li>JaneDoe - Level 8</li>
-      <li>JohnSmith - Level 7</li>
-      <li>Alex99 - Level 6</li>
-      <li>You - Level 5</li>
-    </ul>
-  </div>
-</main>
+<input id="name" placeholder="Full Name">
+<input id="title" placeholder="Professional Title">
+<textarea id="skills" placeholder="Skills (comma separated)"></textarea>
+<textarea id="experience" placeholder="Work Experience"></textarea>
 
-<div class="overlay" id="overlay"></div>
-<div class="modal" id="modal">
-  <h3 id="modalJobTitle"></h3>
-  <p id="modalJobDesc"></p>
-  <button id="closeModal">Close</button>
+<button class="btn" onclick="generateResume()">Generate Resume</button>
+<button class="btn" onclick="downloadResume()">Download Resume (.txt)</button>
+
+<h3>Preview</h3>
+<div class="resume-preview" id="resumePreview"></div>
+</section>
+
+<section id="tracker">
+<h2>Application Tracker</h2>
+
+<div class="kanban">
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+<h4>Applied</h4>
+</div>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+<h4>Interview</h4>
+</div>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+<h4>Offer</h4>
+</div>
+<div class="column" ondrop="drop(event)" ondragover="allowDrop(event)">
+<h4>Rejected</h4>
+</div>
 </div>
 
+<input id="taskInput" placeholder="Add job application">
+<button class="btn" onclick="addTask()">Add</button>
+
+</section>
+
+<footer>
+© 2026 CareerLaunch - 100% Free & Open
+</footer>
+
 <script>
-let xp = 60;
-let level = 5;
 
-const xpBar = document.getElementById('xpBar');
-const levelSpan = document.getElementById('level');
-const badges = document.querySelectorAll('.badge');
-const notification = document.getElementById('notification');
+/* ---------------- JOB DATA ---------------- */
 
-function updateXP(amount){
-  xp += amount;
-  if(xp >= 100){
-    xp = xp - 100;
-    level++;
-    levelSpan.textContent = level;
-    showNotification(`🎉 Level Up! You are now Level ${level}`);
-  }
-  xpBar.style.width = xp + '%';
-  unlockBadges();
+const jobs = [
+{title:"Frontend Developer",location:"Remote",salary:"$80k"},
+{title:"Backend Developer",location:"New York",salary:"$100k"},
+{title:"UI/UX Designer",location:"San Francisco",salary:"$90k"},
+{title:"Data Analyst",location:"Remote",salary:"$85k"}
+];
+
+const container=document.getElementById("jobsContainer");
+
+function displayJobs(list){
+container.innerHTML="";
+list.forEach((job,index)=>{
+const div=document.createElement("div");
+div.className="card";
+div.innerHTML=`
+<h4>${job.title}</h4>
+<p>${job.location}</p>
+<p>${job.salary}</p>
+<button class="btn" onclick="saveJob(${index})">Save</button>
+`;
+container.appendChild(div);
+});
 }
 
-function unlockBadges(){
-  badges.forEach(badge => {
-    const requiredXP = parseInt(badge.dataset.xp) * 5;
-    if(xp >= requiredXP && !badge.classList.contains('unlocked')){
-      badge.classList.add('unlocked');
-      showNotification(`🏅 Badge Unlocked: ${badge.textContent}`);
-    }
-  });
-}
+displayJobs(jobs);
 
-function showNotification(msg){
-  notification.textContent = msg;
-  setTimeout(()=>{ notification.textContent = '🔔 Complete quests to earn XP!'; }, 3000);
-}
+document.getElementById("search").addEventListener("input",filterJobs);
+document.getElementById("locationFilter").addEventListener("change",filterJobs);
 
-// Job application buttons
-document.querySelectorAll('.applyBtn').forEach(btn=>{
-  btn.addEventListener('click', e=>{
-    const card = e.target.parentElement;
-    const title = card.querySelector('strong').textContent;
-    const desc = card.querySelector('p').textContent + ' ...';
-    showModal(title, desc);
-    updateXP(parseInt(card.dataset.xp));
-    markQuestComplete('Apply to 1 job today');
-  });
+function filterJobs(){
+const keyword=document.getElementById("search").value.toLowerCase();
+const location=document.getElementById("locationFilter").value;
+
+const filtered=jobs.filter(job=>{
+return job.title.toLowerCase().includes(keyword) &&
+(location===""||job.location===location);
 });
 
-// Quests
-function markQuestComplete(name){
-  const quests = document.querySelectorAll('.quest');
-  quests.forEach(q=>{
-    if(q.textContent === name && !q.classList.contains('completed')){
-      q.classList.add('completed');
-      q.style.background = '#00ffcc';
-      q.style.color = '#111';
-      updateXP(parseInt(q.dataset.xp));
-      showNotification(`✅ Quest Completed: ${name}`);
-    }
-  });
+displayJobs(filtered);
 }
 
-// Modal
-const modal = document.getElementById('modal');
-const overlay = document.getElementById('overlay');
-const modalJobTitle = document.getElementById('modalJobTitle');
-const modalJobDesc = document.getElementById('modalJobDesc');
-document.getElementById('closeModal').addEventListener('click', closeModal);
-overlay.addEventListener('click', closeModal);
-
-function showModal(title, desc){
-  modalJobTitle.textContent = title;
-  modalJobDesc.textContent = desc;
-  modal.style.display = 'block';
-  overlay.style.display = 'block';
-}
-function closeModal(){
-  modal.style.display = 'none';
-  overlay.style.display = 'none';
+function saveJob(index){
+let saved=JSON.parse(localStorage.getItem("savedJobs"))||[];
+saved.push(jobs[index]);
+localStorage.setItem("savedJobs",JSON.stringify(saved));
+alert("Job saved locally!");
 }
 
-// Quest click for XP bonus
-document.querySelectorAll('.quest').forEach(q=>{
-  q.addEventListener('click', ()=> markQuestComplete(q.textContent));
-});
+/* ---------------- RESUME ---------------- */
+
+function generateResume(){
+const name=document.getElementById("name").value;
+const title=document.getElementById("title").value;
+const skills=document.getElementById("skills").value;
+const experience=document.getElementById("experience").value;
+
+const resumeText=
+`${name}
+${title}
+
+Skills:
+${skills}
+
+Experience:
+${experience}`;
+
+document.getElementById("resumePreview").textContent=resumeText;
+}
+
+function downloadResume(){
+const text=document.getElementById("resumePreview").textContent;
+const blob=new Blob([text],{type:"text/plain"});
+const link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="resume.txt";
+link.click();
+}
+
+/* ---------------- KANBAN ---------------- */
+
+function allowDrop(ev){ev.preventDefault();}
+
+function drag(ev){ev.dataTransfer.setData("text",ev.target.id);}
+
+function drop(ev){
+ev.preventDefault();
+const data=ev.dataTransfer.getData("text");
+ev.target.closest(".column").appendChild(document.getElementById(data));
+}
+
+function addTask(){
+const text=document.getElementById("taskInput").value;
+if(!text)return;
+
+const div=document.createElement("div");
+div.className="task";
+div.id="task"+Date.now();
+div.draggable=true;
+div.ondragstart=drag;
+div.innerText=text;
+
+document.querySelector(".column").appendChild(div);
+document.getElementById("taskInput").value="";
+}
+
 </script>
+
 </body>
 </html>
